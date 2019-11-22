@@ -6,9 +6,7 @@ router.get("/", (req, res) => {
 });
 
 router.use("/api/fotos", require("./controllers/FotosController"));
-
-router.get("/usuarios", (req, res) => {
-  return res.send();
-});
+router.use("/auth", require("./controllers/AuthController"));
+router.use("/usuarios", require("./controllers/UsuariosController"));
 
 module.exports = router;

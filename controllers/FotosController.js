@@ -1,25 +1,27 @@
 const express = require("express");
+const _ = require("lodash");
 const router = express.Router();
 const { Foto, Comentario, Usuario } = require("../sequelize").models;
 const Sequelize = require("sequelize");
 
 router.get("", (req, res) => {
   //TODO: implementar usuarioLogado
-  let usuario;
-  return Usuario.findByPk(1, { include: ["Amigos"] })
-    .then(_usuario => {
-      usuario = _usuario;
-      return Foto.findAll({
-        where: {
-          UsuarioId: {
-            [Sequelize.Op.in]: _usuario.Amigos.map(amigo => amigo.id)
-          }
+  const getFotos = async () => {
+    const usuario = await Usuario.findByPk(1);
+    const amigos = await usuario.getAmigos();
+    const fotos = await Foto.findAll({
+      where: {
+        UsuarioId: {
+          [Sequelize.Op.in]: amigos.map(amigo => amigo.id)
         }
-      });
-    })
-    .then(fotos => {
-      return res.json(fotos);
+      },
+      include: [{ all: true }, { model: Comentario, include: [Usuario] }]
     });
+    return fotos;
+  };
+  getFotos().then(fotos => {
+    res.json(fotos);
+  });
   //TODO: pegar lista de fotos dos amigos?
   // retornar listar
 });
@@ -52,38 +54,47 @@ router.get("/:idFoto/curtida", (req, res) => {
   //TODO: Implementar usuarioLogado
   const usuarioLogado = { id: 1 };
 
-  let foto;
-  return Foto.findByPk(idFoto)
-    .then(_foto => {
-      foto = _foto;
-      return Usuario.findByPk(2);
+  const curteFoto = async () => {
+    const usuario = await Usuario.findByPk(usuarioLogado.id);
+    const foto = await Foto.findByPk(idFoto);
+    const curtidores = await foto.getCurtidores();
+
+    if (_.find(curtidores, c => c.id == usuarioLogado.id)) {
+      const teste = await foto.removeCurtidor(usuario);
+    } else {
+      await foto.addCurtidor(usuario);
+    }
+    return await foto.reload({
+      include: [{ all: true }, { model: Comentario, include: [Usuario] }]
+    });
+  };
+  curteFoto()
+    .then(foto => {
+      return res.json(foto);
     })
-    .then(usuario => {
-      return foto.addCurtidor(usuario);
-    })
-    .then(() => {
-      return Foto.findByPk(idFoto, { include: ["Curtidores"] });
-    })
-    .then(foto => res.json(foto));
+    .catch(err => {
+      console.error(err);
+      return res.status(500).send();
+    });
 });
 
 router.post("/:idFoto/comentario", (req, res) => {
   const { idFoto } = req.params;
-  console.log(req.body);
   const { texto } = req.body;
+
   //TODO: Implementar usuarioLogado
   const usuarioLogado = { id: 1 };
 
   return Foto.findByPk(idFoto)
     .then(foto => {
       return foto.createComentario({
-        text: texto,
+        texto: texto,
         UsuarioId: usuarioLogado.id
       });
     })
     .then(() => {
       return Foto.findByPk(idFoto, {
-        include: [Comentario]
+        include: [{ all: true }, { model: Comentario, include: [Usuario] }]
       });
     })
     .then(foto => {

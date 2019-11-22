@@ -1,44 +1,33 @@
-module.exports = ({ Usuario, Foto }) => {
-  const geraUsuariosEAmigos = () => {
-    let alberto;
-    let rafael;
-    let vitor;
-    return Usuario.create({
+"use strict";
+const bcrypt = require("bcrypt");
+const secret = require("./constants").secret;
+
+module.exports = async ({ Usuario, Foto }) => {
+  const geraUsuariosEAmigos = async () => {
+    const hashedPwd = await bcrypt.hash(`${"123456"}.${secret}`, 12);
+    const alberto = await Usuario.create({
       login: "alots",
-      senha: "123456",
+      senha: hashedPwd,
       urlFotoPerfil:
-        "https://s3.amazonaws.com/loa-production-23ffs35gui41a/writers/images/000/000/187/big/lincoln_abraham_WD.jpg?1458837750"
-    })
-      .then(usr => {
-        alberto = usr;
-        return Usuario.create({
-          login: "rafael",
-          senha: "123456",
-          urlFotoPerfil:
-            "https://olhardigital.com.br/uploads/acervo_imagens/2015/02/r16x9/20150219125722_1200_675.jpg"
-        });
-      })
-      .then(usr => {
-        rafael = usr;
-        return Usuario.create({
-          login: "vitor",
-          senha: "123456",
-          urlFotoPerfil:
-            "https://biomania.com.br/images/materias/2264/3798585923594400768.jpg"
-        });
-      })
-      .then(usr => {
-        vitor = usr;
-        return Promise.all([
-          alberto.addAmigo(rafael),
-          alberto.addAmigo(vitor),
-          rafael.addAmigo(vitor),
-          vitor.addAmigo(alberto)
-        ]);
-      })
-      .then(() => {
-        return [alberto, rafael, vitor];
-      });
+        "https://pbs.twimg.com/profile_images/645140943130202112/3bs4Db2Z_400x400.jpg"
+    });
+    const rafael = await Usuario.create({
+      login: "rafael",
+      senha: hashedPwd,
+      urlFotoPerfil:
+        "https://olhardigital.com.br/uploads/acervo_imagens/2015/02/r16x9/20150219125722_1200_675.jpg"
+    });
+    const vitor = await Usuario.create({
+      login: "vitor",
+      senha: hashedPwd,
+      urlFotoPerfil:
+        "https://biomania.com.br/images/materias/2264/3798585923594400768.jpg"
+    });
+    await alberto.addAmigo(rafael);
+    await alberto.addAmigo(vitor);
+    await rafael.addAmigo(vitor);
+    await vitor.addAmigo(alberto);
+    return [alberto, rafael, vitor];
   };
 
   const geraFotos = UsuarioId => {
@@ -58,15 +47,16 @@ module.exports = ({ Usuario, Foto }) => {
     ]);
   };
 
-  const popular = () =>
-    geraUsuariosEAmigos().then(usuarios => {
-      return Promise.all(usuarios.map(usuario => geraFotos(usuario.id)));
-    });
-  Usuario.count().then(total => {
-    if (total > 0) {
-      console.log("Tabelas já populadas");
-      return;
-    }
-    popular();
-  });
+  const popularBanco = async () => {
+    const usuarios = await geraUsuariosEAmigos();
+    return Promise.all(usuarios.map(usuario => geraFotos(usuario.id)));
+  };
+
+  const quantidadeUsuarios = await Usuario.count();
+
+  if (quantidadeUsuarios > 0) {
+    console.log("Tabelas já populadas");
+    return;
+  }
+  popularBanco();
 };

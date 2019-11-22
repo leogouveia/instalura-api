@@ -6,10 +6,9 @@ const fs = require("fs");
 const _ = require("lodash");
 const seed = require("./seed");
 
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: "./db.sqlite"
-});
+const dbConfig = require("./constants").config.db;
+
+const sequelize = new Sequelize(dbConfig);
 
 let models = {};
 
