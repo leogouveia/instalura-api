@@ -42,9 +42,10 @@ router.get("", (req, res) => {
 
 router.post("", upload.single("foto"), (req, res) => {
   const usuarioLogado = req.usuarioLogado;
+  const { comentario } = req.body;
   Foto.create({
     url: `http://localhost:8888/files/fotos/${req.file.filename}`,
-    comentario: "olar",
+    comentario,
     usuarioId: usuarioLogado.id
   });
   return res.send();

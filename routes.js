@@ -2,10 +2,6 @@ const express = require("express");
 const authMiddleware = require("./auth_middleware");
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  return res.send("olar");
-});
-
 router.use("/files/fotos", express.static("uploads"));
 
 router.use("/auth", require("./controllers/AuthController"));
