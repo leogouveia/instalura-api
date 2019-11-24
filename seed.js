@@ -6,7 +6,7 @@ module.exports = async ({ Usuario, Foto }) => {
   const geraUsuariosEAmigos = async () => {
     const hashedPwd = await bcrypt.hash(`${"123456"}.${secret}`, 12);
     const alberto = await Usuario.create({
-      login: "alots",
+      login: "alberto",
       senha: hashedPwd,
       urlFotoPerfil:
         "https://pbs.twimg.com/profile_images/645140943130202112/3bs4Db2Z_400x400.jpg"
@@ -30,19 +30,19 @@ module.exports = async ({ Usuario, Foto }) => {
     return [alberto, rafael, vitor];
   };
 
-  const geraFotos = UsuarioId => {
+  const geraFotos = usuarioId => {
     return Promise.all([
       Foto.create({
         url:
           "https://www.fatosdesconhecidos.com.br/wp-content/uploads/2018/02/thomas-edison-1.jpg",
         comentario: "Wow que legal!",
-        UsuarioId
+        usuarioId
       }),
       Foto.create({
         url:
           "https://www.investors.com/wp-content/uploads/2016/03/LSpic_Franklin_031816_pd.jpg",
         comentario: "Isso é bom demais!",
-        UsuarioId
+        usuarioId
       })
     ]);
   };

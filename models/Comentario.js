@@ -1,12 +1,16 @@
 "use strict";
-const Usuario = require("./Usuario");
-
 module.exports = (sequelize, DataTypes) => {
-  const Comentario = sequelize.define("Comentario", {
-    texto: {
-      type: DataTypes.STRING
+  const Comentario = sequelize.define(
+    "comentario",
+    {
+      texto: {
+        type: DataTypes.STRING
+      }
+    },
+    {
+      underscored: true
     }
-  });
+  );
   Comentario.associate = ({ Usuario }) => {
     Comentario.belongsTo(Usuario);
   };

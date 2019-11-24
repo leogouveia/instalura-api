@@ -15,17 +15,30 @@ router.post("/login", (req, res) => {
     }
   })
     .then(_usuario => {
+      if (!_usuario) throw new Error("Usuário ou senha invalidos");
       usuario = _usuario;
       return bcrypt.compare(`${senha}.${secret}`, usuario.senha);
     })
     .then(match => {
-      if (!match) throw new Error("Senha invalida");
-      const token = jwt.sign({ data: usuario }, secret, { expiresIn: "36h" });
-      return res.json({ token });
+      if (!match) throw new Error("Usuário ou senha invalidos");
+      const token = jwt.sign(
+        {
+          data: {
+            id: usuario.id,
+            login: usuario.login
+          }
+        },
+        secret,
+        { expiresIn: "36h" }
+      );
+      return res.json({
+        token,
+        usuario: { login: usuario.login, urlFotoPerfil: usuario.urlFotoPerfil }
+      });
     })
     .catch(error => {
       console.error(error);
-      res.status(500).json(error);
+      res.status(500).send(error);
     });
 });
 

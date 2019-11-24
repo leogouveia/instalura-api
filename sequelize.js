@@ -19,7 +19,7 @@ const files = fs.readdirSync(modelsDir);
 files.forEach(file => {
   const fileUri = path.join(modelsDir, file);
   const m = sequelize.import(fileUri);
-  _.merge(models, { [m.name]: m });
+  _.merge(models, { [_.capitalize(m.name)]: m });
 });
 
 const associateModel = obj => {

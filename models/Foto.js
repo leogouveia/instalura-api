@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   console.log(sequelize.define);
 
   const Foto = sequelize.define(
-    "Foto",
+    "foto",
     {
       url: {
         type: DataTypes.STRING,
@@ -15,18 +15,21 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       }
     },
-    {}
+    {
+      underscored: true
+    }
   );
 
   Foto.associate = ({ Usuario, Comentario }) => {
-    Foto.Usuario = Foto.belongsTo(Usuario);
-    Foto.Comentarios = Foto.hasMany(Comentario);
+    Foto.Usuario = Foto.belongsTo(Usuario, { underscored: true });
+    Foto.Comentarios = Foto.hasMany(Comentario, { underscored: true });
     Foto.belongsToMany(Usuario, {
       as: {
-        singular: "Curtidor",
-        plural: "Curtidores"
+        singular: "curtidor",
+        plural: "curtidores"
       },
-      through: "Curtidas"
+      through: "curtidas",
+      underscored: true
     });
   };
 

@@ -20,8 +20,7 @@ function checkToken(token, secret) {
 
 module.exports = (req, res, next) => {
   const secret = require("./constants").secret;
-
-  const token = getTokenString(req.headers["X-Authorization"]);
+  const token = getTokenString(req.headers["x-auth-token"]);
   if (!token) {
     return res.status(403).send("Bearer token não recebido");
   }
