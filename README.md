@@ -15,7 +15,20 @@ O objetivo deste projeto foi portar o projeto original para NodeJS e Express. Al
 
 O mesmo inicializará o servidor que poderá ser acessado pelo endereço http://localhost:8888
 
-### Prerequisites
+## Endpoint
+
+| Endpoints                            | Uso                                                                                                    | Parametros                                                                                                                                                      |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /auth/login`                   | Realiza autenticação na aplicação, recebe um objeto contendo o token e os dados do usuário autenticado | **login** - String contendo login do usuário <br> **senha** - String contendo senha do usuário                                                                  |
+| `GET /api/fotos`                     | Retorna lista com fotos dos amigos do usuário logado                                                   |                                                                                                                                                                 |
+| `POST /api/fotos`                    | Cria foto enviada pelo usuário autenticado                                                             | **foto** - Arquivo com foto <br> **comentario** - String com comentário da foto                                                                                 |
+| `DELETE /api/fotos/:idFoto`          | Deleta foto                                                                                            |                                                                                                                                                                 |
+| `GET /api/fotos/:idFoto/curtida`     | Curte foto                                                                                             |                                                                                                                                                                 |
+| `POST /api/fotos/:idFoto/comentario` | Comenta em foto                                                                                        | **text** - String com comentário.                                                                                                                               |
+| `GET /api/fotos/usuario/:login`      | Retorna lista de fotos do usuário informado                                                            |                                                                                                                                                                 |
+| `POST /usuarios`                     | Cria usuário                                                                                           | **login** - String contendo login do usuário <br> **senha** - String contendo senha do usuário <br> **urlFotoPefil** - String contendo url para foto do usuário |
+
+### Prerequisitos
 
 - Nodejs versão 8 ou superior.
 
