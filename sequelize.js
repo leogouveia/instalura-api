@@ -34,7 +34,8 @@ const associateModel = obj => {
 
 associateModel(models);
 
-sequelize.sync({ force: true }).then(() => seed(models));
+///Use sync({force: true}) to recreate database.
+sequelize.sync().then(() => seed(models));
 
 module.exports = {
   sequelize,

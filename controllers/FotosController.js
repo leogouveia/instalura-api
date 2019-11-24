@@ -3,6 +3,17 @@ const _ = require("lodash");
 const router = express.Router();
 const { Foto, Comentario, Usuario } = require("../sequelize").models;
 const Sequelize = require("sequelize");
+const path = require("path");
+const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) =>
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    )
+});
+const upload = multer({ storage });
 
 router.get("", (req, res) => {
   const usuarioLogado = req.usuarioLogado;
@@ -16,6 +27,10 @@ router.get("", (req, res) => {
           [Sequelize.Op.in]: amigos.map(amigo => amigo.id)
         }
       },
+      order: [
+        ["updatedAt", "desc"],
+        ["createdAt", "asc"]
+      ],
       include: [{ all: true }, { model: Comentario, include: [Usuario] }]
     });
     return fotos;
@@ -25,8 +40,13 @@ router.get("", (req, res) => {
   });
 });
 
-router.post("", (req, res) => {
-  //TODO: upload foto
+router.post("", upload.single("foto"), (req, res) => {
+  const usuarioLogado = req.usuarioLogado;
+  Foto.create({
+    url: `http://localhost:8888/files/fotos/${req.file.filename}`,
+    comentario: "olar",
+    usuarioId: usuarioLogado.id
+  });
   return res.send();
 });
 
@@ -116,6 +136,10 @@ router.get("/usuario/:login", (req, res) => {
     .then(usuario => {
       if (!usuario) return null;
       return usuario.getFotos({
+        order: [
+          ["updatedAt", "DESC"],
+          ["createdAt", "DESC"]
+        ],
         include: [
           { all: true },
           { model: Comentario, as: "comentarios", include: [Usuario] }

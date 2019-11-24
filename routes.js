@@ -6,6 +6,8 @@ router.get("/", (req, res) => {
   return res.send("olar");
 });
 
+router.use("/files/fotos", express.static("uploads"));
+
 router.use("/auth", require("./controllers/AuthController"));
 
 router.use(
